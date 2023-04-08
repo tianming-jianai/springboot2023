@@ -4,6 +4,7 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import com.atguigu.bean.Pet;
 import com.atguigu.bean.User;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -26,7 +27,7 @@ import org.springframework.context.annotation.Import;
  **/
 @Import({User.class, PatternLayoutEncoder.class})
 @Configuration(proxyBeanMethods = true) // 告诉SpringBoot这是一个配置类
-@ConditionalOnBean(name = "tom")
+@ConditionalOnMissingBean(name = "tom")
 public class MyConfig {
 
     /**
