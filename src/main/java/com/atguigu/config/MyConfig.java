@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 
 /**
  * @author 张世罡
@@ -28,6 +29,7 @@ import org.springframework.context.annotation.Import;
 @Import({User.class, PatternLayoutEncoder.class})
 @Configuration(proxyBeanMethods = true) // 告诉SpringBoot这是一个配置类
 @ConditionalOnMissingBean(name = "tom")
+@ImportResource("classpath:beans.xml")
 public class MyConfig {
 
     /**

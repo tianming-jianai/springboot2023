@@ -49,6 +49,9 @@ public class Springboot2023Application {
 
         boolean user = run.containsBean("user");
         System.out.println("容器中user组件：" + user);
+
+        System.out.println("haha：" + run.containsBean("haha"));
+        System.out.println("hehe：" + run.containsBean("hehe"));
     }
 
 }
