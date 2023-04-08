@@ -52,6 +52,8 @@ public class Springboot2023Application {
 
         System.out.println("haha：" + run.containsBean("haha"));
         System.out.println("hehe：" + run.containsBean("hehe"));
+
+        System.out.println("Bean定义数量：" + run.getBeanDefinitionCount());
     }
 
 }
