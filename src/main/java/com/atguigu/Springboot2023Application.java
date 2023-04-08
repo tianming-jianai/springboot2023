@@ -42,6 +42,13 @@ public class Springboot2023Application {
 //
 //        PatternLayoutEncoder bean = run.getBean(PatternLayoutEncoder.class);
 //        System.out.println(bean);
+
+
+        boolean tomcat = run.containsBean("tomcat");
+        System.out.println("容器中tomcat组件：" + tomcat);
+
+        boolean user = run.containsBean("user");
+        System.out.println("容器中user组件：" + user);
     }
 
 }

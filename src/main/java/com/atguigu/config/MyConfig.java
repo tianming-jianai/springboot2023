@@ -3,6 +3,7 @@ package com.atguigu.config;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import com.atguigu.bean.Pet;
 import com.atguigu.bean.User;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -25,12 +26,14 @@ import org.springframework.context.annotation.Import;
  **/
 @Import({User.class, PatternLayoutEncoder.class})
 @Configuration(proxyBeanMethods = true) // 告诉SpringBoot这是一个配置类
+@ConditionalOnBean(name = "tom")
 public class MyConfig {
 
     /**
      * 外部无论对配置类中的这个组件注册方法调用多少次获取的都是之前注册容器中的单实例对象
      * @return
      */
+//    @ConditionalOnBean(name = "tomcat")
     @Bean(name = "user") // 给容器中添加组件，返回类型就是组件类型。返回的值，就是组件在容器中的实例
     public User user01() {
         User user = new User("zhangsan", 18);
@@ -39,7 +42,7 @@ public class MyConfig {
         return user;
     }
 
-//    @Bean(name = "tomcat")
+    @Bean(name = "tomcat")
     public Pet tomcatPet() {
         return new Pet("tocmat");
     }
