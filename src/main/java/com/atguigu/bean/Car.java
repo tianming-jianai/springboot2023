@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * 只有在容器中，才能拥有SpringBoot提供的强大功能
  **/
 @Data
-@Component
+//@Component
 @ConfigurationProperties(prefix = "mycar")
 public class Car {
     private String brand;

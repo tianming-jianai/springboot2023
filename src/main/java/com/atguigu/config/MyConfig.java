@@ -1,10 +1,10 @@
 package com.atguigu.config;
 
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import com.atguigu.bean.Car;
 import com.atguigu.bean.Pet;
 import com.atguigu.bean.User;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -28,8 +28,9 @@ import org.springframework.context.annotation.ImportResource;
  **/
 @Import({User.class, PatternLayoutEncoder.class})
 @Configuration(proxyBeanMethods = true) // 告诉SpringBoot这是一个配置类
-@ConditionalOnMissingBean(name = "tom")
+//@ConditionalOnMissingBean(name = "tom")
 @ImportResource("classpath:beans.xml")
+@EnableConfigurationProperties(Car.class) // 1. 开启属性配置绑定功能，Car.class 2. 把这个Car组件自动注册到容器中
 public class MyConfig {
 
     /**
