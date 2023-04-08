@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
  *
  **/
 @Import({User.class, PatternLayoutEncoder.class})
-@Configuration(proxyBeanMethods = false) // 告诉SpringBoot这是一个配置类
+@Configuration(proxyBeanMethods = true) // 告诉SpringBoot这是一个配置类
 public class MyConfig {
 
     /**
@@ -39,7 +39,7 @@ public class MyConfig {
         return user;
     }
 
-    @Bean(name = "tomcat")
+//    @Bean(name = "tomcat")
     public Pet tomcatPet() {
         return new Pet("tocmat");
     }
