@@ -40,9 +40,46 @@ public @interface AutoConfigurationPackage {}
     默认扫描我们当前系统里面所有META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports位置的文件
     spring-boot-autoconfigure-3.0.5.jar包里面有这个文件
 ```
-#### 按需开启自动配置项
+#### 3.1 142个自动配置类
+
+#### 3.2按需开启自动配置项
 ```text
 虽然我们142个场景的所有自动配置启动的时候默认全部加载。
 但是不是全部加载，按条件装配规则（@Conditional）,最终会按需加载。
 ```
 
+#### 3.3 修改默认配置
+```java
+@Bean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME) // 容器中有这个名字multipartResolver的组件
+@ConditionalOnMissingBean(MultipartResolver.class) // 容器中没有这个类型组件
+public StandardServletMultipartResolver multipartResolver() {
+    StandardServletMultipartResolver multipartResolver = new StandardServletMultipartResolver();
+    multipartResolver.setResolveLazily(this.multipartProperties.isResolveLazily());
+    return multipartResolver;
+}
+// 给容器中加入了文件上传解析器
+@Bean标注的方法传入了对象参数，这个参数的值就会从容器中找
+```
+
+SpringBoot默认会在底层配置好所有的组件。但是如果用户自己配置了以用户的优先。
+
+```java
+@Bean
+@ConditionalOnMissingBean
+public CharacterEncodingFilter characterEncodingFilter(){
+}
+```
+
+总结：
+- SpringBoot先加载所有的自动配置类
+- 每个自动配置类按照条件进行生效，默认都会绑定配置文件指定的值。
+- xxxProperties里面拿，xxxProperties和配置文件进行了绑定
+- 生效的配置类就会给容器中装配很多组件
+- 只要容器中有这些组件，先当与这些功能就有了
+- 定制化配置
+  - 用户直接自己@Bean替换底层的组件
+  - 用户去看这个组件是获取的配置文件什么值就去修改
+
+xxxAutoConfiguration ---> 组件 ----> xxxProperties里面拿值 ---> application.properties
+
+### 3.4 最佳实践
