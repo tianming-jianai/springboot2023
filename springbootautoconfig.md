@@ -83,3 +83,15 @@ public CharacterEncodingFilter characterEncodingFilter(){
 xxxAutoConfiguration ---> 组件 ----> xxxProperties里面拿值 ---> application.properties
 
 ### 3.4 最佳实践
+- 引入场景依赖
+  - https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.build-systems.starters
+- 查看自动配置了那些（选做）
+  - 自己分析，引入场景对应的自动配置一般都生效了
+  - application.properties：debug=true 查看自动配置报告:Positive生效 Negative不生效
+- 是否需要修改
+  - 参照文档修改配置项
+    - https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#appendix.application-properties
+    - 自己分析，xxxProperties绑定了配置文件
+  - 自定义加入或者替换组件
+    - @Bean、@Component...
+  - 自定义器 xxxCustomizer

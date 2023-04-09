@@ -1,3 +1,5 @@
 mycar:
   price: 10000
   brand: BYD
+
+debug: true
