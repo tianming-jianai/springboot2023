@@ -2,4 +2,27 @@ mycar:
   price: 10000
   brand: BYD
 
-debug: true
+#debug: true
+
+person:
+  name: "zhangsan \n is a man"
+  boss: false
+  birth: 2023/4/9
+  age: 18
+  interests: [篮球,足球,跑步,钢琴]
+  animal: [dog,cat,fish]
+  score: {english:80,math:90}
+  salary's:
+    - 9999.89
+    - 9999.99
+  pet:
+    name: tom
+    weight: 10.5
+  all-pets:
+    sick:
+      - {name: 阿狗, weight: 10.6}
+      - name: 阿猫
+        weight: 13.2
+    health:
+      - {name: 阿花, weight: 199.9}
+      - {name: 阿明, weight: 192.9}
