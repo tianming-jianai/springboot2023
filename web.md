@@ -119,3 +119,101 @@ WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProv
 }
 ```
 
+## 3、请求参数处理
+### 0、请求映射
+- @xxxMapping
+- Rest风格支持（使用HTTP请求方式动词来表示对资源的操作）
+  - 以前：/getUser 获取用户 /deleteUser 删除用户 /editUser 修改用户 /saveUser 保存用户
+  - 现在：/user GET 获取用户 DELETE 删除用户 PUT 修改用户 POST 保存用户
+  - 核心Filter;HiddenHttpMethodFilter
+    - 用法：表单method=post，隐藏域_method=put
+
+
+
+Rest原理（表单提交要使用REST的时候）
+
+- 表单提交会带上_method=PUT
+- 请求狗来被HIddenHttpMethodFilter拦截
+  - 请求是否正常，并且是POST
+    - 获取到_method的值
+    - 兼容一下请求：PUT/DELETE/PATCH
+    - 原生request(post)，包装模式requestWrapper重写了getMethod方法，返回的是传入的值
+    - 过滤链放行的时候使用的是wrapper。以后的方法调用getMethod是调用requstWrapper的
+
+```HTML
+<form action="/user" method="post">
+  <input name="_method" type="hidden" value="PUT">
+  <input value="REST-PUT 提交" type="submit">
+</form>
+```
+
+```java
+@PutMapping("/user")
+public String putUser(){
+    return "PUT 张三";
+}
+```
+
+```java
+@Bean
+@ConditionalOnMissingBean(HiddenHttpMethodFilter.class)
+@ConditionalOnProperty(prefix = "spring.mvc.hiddenmethod.filter", name = "enabled", matchIfMissing = false)
+public OrderedHiddenHttpMethodFilter hiddenHttpMethodFilter() {
+    return new OrderedHiddenHttpMethodFilter();
+}
+```
+
+```yaml
+spring:
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true # 开启页面表单的rest功能
+```
+
+```java
+// org.springframework.web.filter.HiddenHttpMethodFilter#doFilterInternal
+private static final List<String> ALLOWED_METHODS =
+			List.of(HttpMethod.PUT.name(), HttpMethod.DELETE.name(), HttpMethod.PATCH.name());
+
+@Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
+
+    HttpServletRequest requestToUse = request;
+
+    if ("POST".equals(request.getMethod()) && request.getAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE) == null) {
+        String paramValue = request.getParameter(this.methodParam);
+        if (StringUtils.hasLength(paramValue)) {
+            String method = paramValue.toUpperCase(Locale.ENGLISH);
+            if (ALLOWED_METHODS.contains(method)) {
+                requestToUse = new HttpMethodRequestWrapper(request, method);
+            }
+        }
+    }
+
+    filterChain.doFilter(requestToUse, response);
+}
+```
+
+```java
+private static class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
+
+    private final String method;
+
+    public HttpMethodRequestWrapper(HttpServletRequest request, String method) {
+        super(request);
+        this.method = method;
+    }
+
+    @Override
+    public String getMethod() {
+        return this.method;
+    }
+}
+```
+
+Rest使用客户端工具
+
+- 比如PostMan直接发送Put/Delete等方式，无需Filter
+
