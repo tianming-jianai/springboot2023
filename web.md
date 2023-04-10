@@ -89,3 +89,33 @@ public void addResourceHandlers(ResourceHandlerRegistry registry) {
     }
 }
 ```
+
+欢迎页的处理规则
+```java
+HandlerMapping：处理器映射，保存了一个Handler能处理那些请求
+@Bean
+public WelcomePageHandlerMapping welcomePageHandlerMapping(ApplicationContext applicationContext,
+    FormattingConversionService mvcConversionService, ResourceUrlProvider mvcResourceUrlProvider) {
+    WelcomePageHandlerMapping welcomePageHandlerMapping = new WelcomePageHandlerMapping(
+    new TemplateAvailabilityProviders(applicationContext), applicationContext, getWelcomePage(),
+    this.mvcProperties.getStaticPathPattern());
+    welcomePageHandlerMapping.setInterceptors(getInterceptors(mvcConversionService, mvcResourceUrlProvider));
+    welcomePageHandlerMapping.setCorsConfigurations(getCorsConfigurations());
+    return welcomePageHandlerMapping;
+}
+
+WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProviders,
+        ApplicationContext applicationContext, Resource welcomePage, String staticPathPattern) {
+    // 要使用欢迎页，必须是/**
+    if (welcomePage != null && "/**".equals(staticPathPattern)) {
+        logger.info("Adding welcome page: " + welcomePage);
+        setRootViewName("forward:index.html");
+    }
+    else if (welcomeTemplateExists(templateAvailabilityProviders, applicationContext)) {
+        // 调用Controller /index
+        logger.info("Adding welcome page template: index");
+        setRootViewName("index");
+    }
+}
+```
+
