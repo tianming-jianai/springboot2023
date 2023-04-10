@@ -24,3 +24,68 @@ It uses the ResourceHttpRequestHandler from Spring MVC so that you can modify th
 ```yaml
 spring.mvc.static-path-pattern=/resources/**
 ```
+### 2.4 静态资源配置原理
+- SpringBoot启动默认加载xxxAutoConfiguration类（自动配置类）
+- SpringMVC功能的自动配置类WebMvcAutoConfiguration生效
+```java
+@AutoConfiguration(after = { DispatcherServletAutoConfiguration.class, TaskExecutionAutoConfiguration.class,
+		ValidationAutoConfiguration.class })
+@ConditionalOnWebApplication(type = Type.SERVLET)
+@ConditionalOnClass({ Servlet.class, DispatcherServlet.class, WebMvcConfigurer.class })
+@ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
+@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
+@ImportRuntimeHints(WebResourcesRuntimeHints.class)
+public class WebMvcAutoConfiguration {}
+```
+- 给容器中配置了什么
+```java
+@Configuration(proxyBeanMethods = false)
+	@Import(EnableWebMvcConfiguration.class)
+	@EnableConfigurationProperties({ WebMvcProperties.class, WebProperties.class })
+	@Order(0)
+	public static class WebMvcAutoConfigurationAdapter implements WebMvcConfigurer, ServletContextAware {}
+```
+- 配置文件的相关属性和xxx进行了绑定。WebMvcProperties==spring.mvc、WebProperties==spring.web
+
+配置类只有一个有参构造器
+```java
+// 有参构造器所有参数值都会从容器中确定
+// WebProperties webProperties 获取和spring.web绑定的所有的值的对象
+// WebMvcProperties mvcProperties 获取和spring.mvc绑定的所有的值的对象
+// ListableBeanFactory beanFactory Spring的beanFactory
+// HttpMessageConverters 找到所有的HttpMessageConverters
+// ResourceHandlerRegistrationCustomizer 找到资源处理器的自定义器
+// DispatcherServletPath
+// ServletRegistrationBean 给应用注册Servlet、Filter...
+public WebMvcAutoConfigurationAdapter(WebProperties webProperties, WebMvcProperties mvcProperties,
+            ListableBeanFactory beanFactory, ObjectProvider<HttpMessageConverters> messageConvertersProvider,
+            ObjectProvider<ResourceHandlerRegistrationCustomizer> resourceHandlerRegistrationCustomizerProvider,
+            ObjectProvider<DispatcherServletPath> dispatcherServletPath,
+            ObjectProvider<ServletRegistrationBean<?>> servletRegistrations) {
+        this.resourceProperties = webProperties.getResources();
+        this.mvcProperties = mvcProperties;
+        this.beanFactory = beanFactory;
+        this.messageConvertersProvider = messageConvertersProvider;
+        this.resourceHandlerRegistrationCustomizer = resourceHandlerRegistrationCustomizerProvider.getIfAvailable();
+        this.dispatcherServletPath = dispatcherServletPath;
+        this.servletRegistrations = servletRegistrations;
+    }
+```
+
+禁用所有静态资源
+```yaml
+spring:
+  web:
+    resources:
+      add-mappings: false
+```
+```java
+// org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration.WebMvcAutoConfigurationAdapter.addResourceHandlers
+@Override
+public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    if (!this.resourceProperties.isAddMappings()) {
+        logger.debug("Default resource handling disabled");
+        return;
+    }
+}
+```
